@@ -21,6 +21,7 @@
     </div>
 </template>
 <script>
+import oboe from 'oboe'
 export default {
   data () {
     return {
@@ -32,7 +33,7 @@ export default {
         user: [{ required: true, message: 'Campo Obrigatório', trigger: 'blur' }],
         password: [
           { required: true, message: 'Campo Obrigatório', trigger: 'blur' },
-          { type: 'string', min: 6, message: 'O comprimento da senha não pode ser inferior a 6 dígitos', trigger: 'blur' }
+          { type: 'string', min: 3, message: 'O comprimento da senha não pode ser inferior a 3 dígitos', trigger: 'blur' }
         ]
       },
       spinShow: false
@@ -40,6 +41,23 @@ export default {
   },
   methods: {
     tryLogin () {
+      oboe({
+        url: 'http://dev-pi2-api.herokuapp.com/api-token-auth/',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: {
+          username: this.formInline.user,
+          password: this.formInline.password
+        }
+      })
+      .done((res) => {
+        console.log('authentication success response: ' + JSON.stringify(res))
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
       console.log(this.formInline.user)
       console.log(this.formInline.password)
       this.spinShow = false

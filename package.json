@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "iview": "^2.5.1",
+    "oboe": "^2.1.4",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
