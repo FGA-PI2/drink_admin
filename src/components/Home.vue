@@ -1,121 +1,131 @@
 <template>
 <div class="layout" :class="{'layout-hide-text': spanLeft < 5}">
-   
-        <Row type="flex">
-            <Col :span="spanLeft" class="layout-menu-left">
-                <Menu active-name="1" theme="dark" width="auto">
-                    <div class="layout-logo-left"></div>
-                    <MenuItem name="1" @click="option = '1'">
-                        <Icon type="ios-navigate" :size="iconSize"></Icon>
-                        <span class="layout-text" @click="option = '1'">Início</span>
-                    </MenuItem>
-                    <MenuItem name="2">
-                        <Icon type="ios-keypad" :size="iconSize"></Icon>
-                        <span class="layout-text" @click="option = '2'">Administrar Bebidas</span>
-                    </MenuItem>
-                    <MenuItem name="3">
-                        <Icon type="ios-analytics" :size="iconSize"></Icon>
-                        <span class="layout-text" @click="option = '3'">Usuários</span>
-                    </MenuItem>
-                </Menu>
-            </Col>
-            <Col :span="spanRight">
-                <div class="layout-header">
-                    <Button type="text" @click="toggleClick">
-                        <Icon type="navicon" size="32"></Icon>
-                    </Button>
-                </div>
-                <div class="layout-content">
-                    <div class="layout-content-main">
-                      <div v-if="option === '1'">
-                        <h1>Bem-Vindo {{user.nome}}!</h1>
-                        </br>
-                        <h2>Bebidas da Máquina</h2>                        
-                        <Row>
-                          <Col span="8">
-                              <Card>
-                                <p slot="title">Posição #1 {{drinks[0].nome}}</p>
-                                  <i-circle :percent="drinksSize[0].size" :stroke-color="drinksSize[0].color">
-                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[0].size}}%</span>
-                                </i-circle>
-                              </Card>
-                          </Col>
-                          <Col span="8">
-                              <Card>
-                                  <p slot="title">Posição #2 {{drinks[1].nome}}</p>
-                                  <i-circle :percent="drinksSize[1].size" :stroke-color="drinksSize[1].color">
-                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[1].size}}%</span>
-                                </i-circle>
-                              </Card>
-                          </Col>
-                          <Col span="8">
-                              <Card dis-hover>
-                                  <p slot="title">Posição #3 {{drinks[2].nome}}</p>
-                                  <i-circle :percent="drinksSize[2].size" :stroke-color="drinksSize[2].color">
-                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[2].size}}%</span>
-                                </i-circle>
-                              </Card>
-                          </Col>
-                      </Row>
-                      </br></br>
-                      <h2>Histórico de Compras</h2>
-                      <Table :columns="columnsOrders" :data="dataOrders"></Table>
-                    </div>
-                    <div v-if="option === '2'">
-                      <Row>
-                            <Card>
-                                <p slot="title">Bebidas</p>
-                                <Table :columns="columns1" :data="data1"></Table>
-                                <Button type="success" @click="modalNewBebida = true" long>Cadastrar Nova Bebida</Button>
-                                <Modal v-model="modal2" width="360">
-                                  <p slot="header" style="color:#f60;text-align:center">
-                                      <Icon type="information-circled"></Icon>
-                                      <span>Atenção!</span>
-                                  </p>
-                                  <div style="text-align:center">
-                                      <p>Você está prestes a excluir uma bebida do seu banco de dados!</p>
-                                      <p>Tem certeza que deseja excluir?</p>
-                                  </div>
-                                  <div slot="footer">
-                                      <Button type="error" size="large" long :loading="modal_loading" @click="del">Excluir</Button>
-                                  </div>
-                                  <Modal
-                                    v-model="modalNewBebida"
-                                    title="Cadastrar nova Bebida"
-                                    ok-text="Cadastrar"
-                                    cancel-text="Cancelar">
-                                    <Form label-position="left" :label-width="100">
-                                      <FormItem label="Nome">
-                                          <Input></Input>
-                                      </FormItem>
-                                      <FormItem label="Preço">
-                                          <Input ></Input>
-                                      </FormItem>
-                                      <FormItem label="Volume">
-                                          <Input ></Input>
-                                      </FormItem>
-                                  </Form>
-                                </Modal>
-                              </Modal>
-                            </Card>
-                            <Card dis-hover>
-                                <p slot="title">Drinks</p>
-                                <Table :columns="columns2" :data="data2"></Table>
-                                <Button type="success" @click="modalNewBebida = true" long>Cadastrar Novo Drinks</Button>
-                            </Card>
-                    </Row>
-                    </div>
-                    <div v-if="option === '3'">
-                      <Table :columns="columnsUsers" :data="dataUsers"></Table>
-                    </div>
-                    </div>
-                </div>
-                <div class="layout-copy">
-                    2017 &copy; SunBar Team!
-                </div>
-            </Col>
-        </Row>
+  <Row type="flex">
+    <Col :span="spanLeft" class="layout-menu-left">
+      <Menu active-name="1" theme="dark" width="auto">
+        <div class="layout-logo-left"></div>
+        <MenuItem name="1" @click="option = '1'">
+            <Icon type="ios-navigate" :size="iconSize"></Icon>
+            <span class="layout-text" @click="option = '1'">Início</span>
+        </MenuItem>
+        <MenuItem name="2">
+            <Icon type="ios-keypad" :size="iconSize"></Icon>
+            <span class="layout-text" @click="option = '2'">Administrar Bebidas</span>
+        </MenuItem>
+        <MenuItem name="3">
+            <Icon type="ios-analytics" :size="iconSize"></Icon>
+            <span class="layout-text" @click="option = '3'">Usuários</span>
+        </MenuItem>
+      </Menu>
+    </Col>
+  <Col :span="spanRight">
+    <div class="layout-header">
+      <Button type="text" @click="toggleClick">
+        <Icon type="navicon" size="32"></Icon>
+      </Button>
     </div>
+      <div class="layout-content">
+          <div class="layout-content-main">
+            <div v-if="option === '1'">
+              <h1>Bem-Vindo {{user.nome}}!</h1>
+              </br>
+              <h2>Bebidas da Máquina</h2>                        
+              <Row>
+                <Col span="8" v-for="(drink, index) in drinks" :key="drink.nome">
+                    <Card>
+                      <p slot="title">Posição #{{index+1}} {{drinks[index].nome}}</p>
+                        <i-circle :percent="drinksSize[index].size" :stroke-color="drinksSize[index].color">
+                          <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[index].size}}%</span>
+                      </i-circle>
+                    </Card>
+                </Col>
+            </Row>
+            </br></br>
+            <h2>Histórico de Compras</h2>
+            <Table :columns="columnsOrders" :data="dataOrders"></Table>
+          </div>
+          <div v-if="option === '2'">
+            <Row>
+
+
+                  <Card>
+                      <p slot="title">Bebidas</p>
+                      <Table :columns="columns1" :data="data1"></Table>
+                      <Button type="success" @click="modalNewBebida = true" long>Cadastrar Nova Bebida</Button>
+                      <Modal v-model="modal2.bool" width="360">
+                        <p slot="header" style="color:#f60;text-align:center">
+                            <Icon type="information-circled"></Icon>
+                            <span>Atenção!</span>
+                        </p>
+                        <div style="text-align:center">
+                            <p>Você está prestes a excluir do seu banco de dados!</p>
+                            <p>Tem certeza que deseja excluir?</p>
+                        </div>
+                        <div slot="footer">
+                            <Button type="error" size="large" long :loading="modal2.loading" @click="del('bebida')">Excluir</Button>
+                        </div>
+                        <Modal
+                          v-model="modalNewBebida"
+                          title="Cadastrar nova Bebida"
+                          :loading="loading"
+                          @on-ok="asyncOK"
+                          cancel-text="Cancelar">
+                          <Form label-position="left" :label-width="100">
+                            <FormItem label="Nome">
+                                <Input v-model="novaBebida.nome"></Input>
+                            </FormItem>
+                            <FormItem label="Preço">
+                                <InputNumber :max="1000" :min="1" v-model="novaBebida.preco"></InputNumber>
+                            </FormItem>
+                            <FormItem label="Volume">
+                                <InputNumber :max="3000" :min="100" v-model="novaBebida.volume"></InputNumber>
+                            </FormItem>
+                            <FormItem label="Volume Restante">
+                                <InputNumber :max="3000" :min="100" v-model="novaBebida.remaining_quantity"></InputNumber>
+                            </FormItem>
+                            <FormItem label="Posição">
+                                <InputNumber :max="3" :min="1" v-model="novaBebida.posicao"></InputNumber>
+                            </FormItem>
+                        </Form>
+                      </Modal>
+                    </Modal>
+                  </Card>
+
+
+
+                  <Card dis-hover>
+                      <p slot="title">Drinks do Cardápio</p>
+                      <Table :columns="columns2" :data="data2"></Table>
+                      <Button type="success" @click="modalNewBebida = true" long>Cadastrar Novo Drinks</Button>
+                      <Modal v-model="modal3.bool" width="360">
+                        <p slot="header" style="color:#f60;text-align:center">
+                            <Icon type="information-circled"></Icon>
+                            <span>Atenção!</span>
+                        </p>
+                        <div style="text-align:center">
+                            <p>Você está prestes a excluir do seu banco de dados!</p>
+                            <p>Tem certeza que deseja excluir?</p>
+                        </div>
+                        <div slot="footer">
+                            <Button type="error" size="large" long :loading="modal3.loading" @click="del('drink')">Excluir</Button>
+                        </div>
+                        </Modal>
+                  </Card>
+
+
+          </Row>
+          </div>
+          <div v-if="option === '3'">
+            <Table :columns="columnsUsers" :data="dataUsers"></Table>
+          </div>
+          </div>
+      </div>
+      <div class="layout-copy">
+          2017 &copy; SunBar Team!
+      </div>
+  </Col>
+  </Row>
+  </div>
 </template>
 <script>
 /* eslint-disable */
@@ -123,9 +133,26 @@ import oboe from 'oboe'
 export default {
   data () {
     return {
+      loading: true,
+      novaBebida: {
+        nome: null,
+        posicao: null,
+        preco: null,
+        volume: null,
+        remaining_quantity: null
+      },
       orders: null,
       modalNewBebida: false,
-      modal2: false,
+      modal2: {
+        bool: false,
+        index: null,
+        loading: false
+      },
+      modal3: {
+        bool: false,
+        index: null,
+        loading: false
+      },
       user: null,
       spanLeft: 5,
       spanRight: 19,
@@ -187,7 +214,8 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.modal2 = true
+                    this.modal2.bool = true
+                    this.modal2.index = params.index
                   }
                 }
               }, 'Excluir')
@@ -230,7 +258,8 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.modal2 = true
+                    this.modal3.bool = true
+                    this.modal3.index = params.index
                   }
                 }
               }, 'Excluir')
@@ -242,8 +271,56 @@ export default {
     }
   },
   methods: {
+    asyncOK () {
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/bebida/`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        },
+        body: this.novaBebida
+      })
+      .done((res) => {
+        this.modalNewBebida = false
+        this.$Message.success('Criado com Sucesso');
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+    },
+    del (type) {
+      console.log('lalaa', type, this.modal3)
+      let url
+      if(type == 'bebida'){
+        url = `http://dev-pi2-api.herokuapp.com/bebida/${this.drinks[this.modal2.index].nome}`
+        this.modal2.loading = true
+      } else {
+        url = `http://dev-pi2-api.herokuapp.com/drink/${this.cardapio[this.modal3.index].nome}`        
+        this.modal3.loading = true
+      }
+      console.log('aqui está a url: ', url)
+      oboe({
+        url: url,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        }
+      })
+      .done((res) => {
+        this.modal2.loading = false
+        this.modal2.bool = false
+        this.modal3.loading = false
+        this.modal3.bool = false
+        this.$Message.success('删除成功');
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+    },
     setGraphics () {
-      for(let x in this.drinksSize){
+      for(let x in this.drinks){
         this.drinksSize[x].size = (this.drinks[x].remaining_quantity * 100) / this.drinks[x].volume
         console.log('the size is: ',this.drinksSize[x].size)
         if(this.drinksSize[x].size <= 10){
