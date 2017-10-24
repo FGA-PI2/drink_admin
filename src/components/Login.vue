@@ -1,5 +1,6 @@
 <template>
     <div id="login">
+      <img src="../assets/logo.png">
         <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
         <FormItem prop="user">
             <Input type="text" v-model="formInline.user" placeholder="Email..." style="width: 300px">
@@ -39,8 +40,58 @@ export default {
       spinShow: false
     }
   },
+  vuex: {
+    getters: {
+      user: store => store.user
+    },
+    actions: {
+      setUser ({dispatch}, obj) {
+        dispatch('SET_USER', obj)
+      }
+    }
+  },
   methods: {
-    tryLogin () {
+    confirm () {
+      this.$Modal.warning({
+        title: '<center>Atenção!</center>',
+        content: '<center>Sua conta não é uma conta administrativa!</center>'
+      })
+      this.spinShow = false
+      this.formInline.user = ''
+      this.formInline.password = ''
+    },
+    tryLogin (token) {
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/users/?email=${this.formInline.user}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+      .done((res) => {
+        console.log(res)
+        if (res[0].is_superuser === false) {
+          this.confirm()
+        } else {
+          console.log(this.$store.state.user)
+          let user = {
+            user: {
+              token: token,
+              email: res[0].email,
+              nome: res[0].first_name
+            }
+          }
+          // this.$store.state.user.token = token
+          this.$store.commit('SET_USER', user)
+          this.$router.push('/home')
+        }
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+    },
+    getToken () {
       oboe({
         url: 'http://dev-pi2-api.herokuapp.com/api-token-auth/',
         method: 'POST',
@@ -53,20 +104,22 @@ export default {
         }
       })
       .done((res) => {
-        console.log('authentication success response: ' + JSON.stringify(res))
+        if (res.token) {
+          this.tryLogin(res.token)
+          console.log('authentication success response: ' + JSON.stringify(res))
+        }
       })
       .fail((errorReport) => {
         console.log(errorReport)
       })
       console.log(this.formInline.user)
       console.log(this.formInline.password)
-      this.spinShow = false
     },
     handleSubmit (name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           this.spinShow = true
-          this.tryLogin()
+          this.getToken()
         } else {
           this.$Message.error('Falha na validação do formulário!')
         }
