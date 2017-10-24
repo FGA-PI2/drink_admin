@@ -28,29 +28,51 @@
                 <div class="layout-content">
                     <div class="layout-content-main">
                       <div v-if="option === '1'">
+                        <h2>Bem-Vindo {{user.nome}}!</h2>
                         <Row>
                           <Col span="8">
                               <Card>
-                                  <p slot="title">{{drinks[0].nome}}</p>
-                                  <canvas id="myChart" width="100" height="100"></canvas>
+                                <p slot="title">Posição #1 {{drinks[0].nome}}</p>
+                                  <i-circle :percent="drinksSize[0].size">
+                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[0].size}}%</span>
+                                </i-circle>
                               </Card>
                           </Col>
                           <Col span="8">
                               <Card>
-                                  <p slot="title">{{drinks[1].nome}}</p>
-                                  <canvas id="myChart2" width="100" height="100"></canvas>
+                                  <p slot="title">Posição #2 {{drinks[1].nome}}</p>
+                                  <i-circle :percent="drinksSize[1].size" stroke-color="#4db8ff">
+                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[1].size}}%</span>
+                                </i-circle>
                               </Card>
                           </Col>
                           <Col span="8">
                               <Card dis-hover>
-                                  <p slot="title">{{drinks[2].nome}}</p>
-                                  <canvas id="myChart3" width="100" height="100"></canvas>
+                                  <p slot="title">Posição #3 {{drinks[2].nome}}</p>
+                                  <i-circle :percent="drinksSize[2].size">
+                                    <span class="demo-Circle-inner" style="font-size:24px">{{drinksSize[2].size}}%</span>
+                                </i-circle>
                               </Card>
                           </Col>
                       </Row>
                     </div>
                     <div v-if="option === '2'">
-                      <h2>DRINKS ADMIN</h2>
+                      <Row>
+                        <Col span="11">
+                            <Card>
+                                <p slot="title">Bebidas</p>
+                                <Table :columns="columns1" :data="data1"></Table>
+                            </Card>
+                        </Col>
+                        <Col span="11" offset="2">
+                            <Card dis-hover>
+                                <p slot="title">Drinks</p>
+                                <p>卡片内容</p>
+                                <p>卡片内容</p>
+                                <p>卡片内容</p>
+                            </Card>
+                        </Col>
+                    </Row>
                     </div>
                     <div v-if="option === '3'">
                       <h2>USERS ADMIN</h2>
@@ -58,14 +80,14 @@
                     </div>
                 </div>
                 <div class="layout-copy">
-                    2011-2016 &copy; TalkingData
+                    2017 &copy; SunBar Team!
                 </div>
             </Col>
         </Row>
     </div>
 </template>
 <script>
-import Chart from 'chart.js'
+/* eslint-disable */
 import oboe from 'oboe'
 export default {
   data () {
@@ -74,60 +96,64 @@ export default {
       spanLeft: 5,
       spanRight: 19,
       drinks: null,
-      option: '1'
+      option: '1',
+      drinksSize: [
+        {size: 0},
+        {size: 0},
+        {size: 0}
+      ],
+      columns1: [
+        {title: 'Nome', key: 'nome'},
+        {title: 'Posicao', key: 'posicao'},
+        {title: 'Restante', key: 'remaining_quantity'},
+        {title: 'Preco', key: 'preco'},
+        {title: 'Volume', key: 'volume'},
+        {
+          title: 'Ações',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      alert(params.index)
+                    }
+                  }
+                }, 'Editar'),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    alert(params.index)
+                  }
+                }
+              }, 'Excluir')
+            ])
+          }
+        }
+      ],
+      data1: []
     }
   },
   methods: {
     setGraphics () {
-      var ctx = document.getElementById('myChart')
-      var ctx2 = document.getElementById('myChart2')
-      var ctx3 = document.getElementById('myChart3')
-      var myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [50, 50],
-            backgroundColor: ['Green', 'white']
-          }],
-
-      // These labels appear in the legend and in the tooltips when hovering different arcs
-          labels: [
-            'Restante',
-            ''
-          ]
-        }
-      })
-      var myChart2 = new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [50, 50],
-            backgroundColor: ['Orange', 'white']
-          }],
-
-      // These labels appear in the legend and in the tooltips when hovering different arcs
-          labels: [
-            'Restante',
-            ''
-          ]
-        }
-      })
-      var myChart3 = new Chart(ctx3, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [50, 50],
-            backgroundColor: ['Blue', 'white']
-          }],
-
-      // These labels appear in the legend and in the tooltips when hovering different arcs
-          labels: [
-            'Restante',
-            ''
-          ]
-        }
-      })
-      console.log(myChart, myChart2, myChart3)
+      for (var i = 0; i <= 80; i++) {
+        this.drinksSize[0].size++
+        this.drinksSize[1].size++
+        this.drinksSize[2].size++
+      }
     },
     toggleClick () {
       if (this.spanLeft === 5) {
@@ -151,8 +177,9 @@ export default {
       }
     })
     .done((res) => {
-      console.log(res)
+      console.log('huhuhuhu', res)
       this.drinks = res
+      this.data1 = res
       this.setGraphics()
     })
     .fail((errorReport) => {
