@@ -310,7 +310,7 @@ export default {
       console.log('INICIOU O COMPUTED')
       this.user = this.$store.getters.returnUser
       oboe({
-        url: `http://dev-pi2-api.herokuapp.com/users/`,
+        url: `//dev-pi2-api.herokuapp.com/users/`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -324,7 +324,7 @@ export default {
         console.log(errorReport)
       })
       oboe({
-        url: `http://dev-pi2-api.herokuapp.com/compra/`,
+        url: `//dev-pi2-api.herokuapp.com/compra/`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -343,7 +343,7 @@ export default {
         console.log(errorReport)
       })
       oboe({
-        url: `http://dev-pi2-api.herokuapp.com/bebida/`,
+        url: `//dev-pi2-api.herokuapp.com/bebida/`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -360,7 +360,7 @@ export default {
         console.log(errorReport)
       })
       oboe({
-        url: `http://dev-pi2-api.herokuapp.com/drink/`,
+        url: `//dev-pi2-api.herokuapp.com/drink/`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -384,7 +384,7 @@ export default {
     asyncOK (type) {
       if(type == 'bebida') {
         oboe({
-          url: `http://dev-pi2-api.herokuapp.com/bebida/`,
+          url: `//dev-pi2-api.herokuapp.com/bebida/`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ export default {
           delete drink['volumes']
           console.log(drink)
           oboe({
-            url: `http://dev-pi2-api.herokuapp.com/drink/`,
+            url: `//dev-pi2-api.herokuapp.com/drink/`,
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -453,10 +453,10 @@ export default {
       console.log('lalaa', type, this.modal3)
       let url
       if(type == 'bebida'){
-        url = `http://dev-pi2-api.herokuapp.com/bebida/${this.drinks[this.modal2.index].nome}`
+        url = `//dev-pi2-api.herokuapp.com/bebida/${this.drinks[this.modal2.index].nome}`
         this.modal2.loading = true
       } else {
-        url = `http://dev-pi2-api.herokuapp.com/drink/${this.cardapio[this.modal3.index].nome}`        
+        url = `//dev-pi2-api.herokuapp.com/drink/${this.cardapio[this.modal3.index].nome}`        
         this.modal3.loading = true
       }
       console.log('aqui está a url: ', url)

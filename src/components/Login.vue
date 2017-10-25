@@ -62,7 +62,7 @@ export default {
     },
     tryLogin (token) {
       oboe({
-        url: `http://dev-pi2-api.herokuapp.com/users/?email=${this.formInline.user}`,
+        url: `//dev-pi2-api.herokuapp.com/users/?email=${this.formInline.user}`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default {
     },
     getToken () {
       oboe({
-        url: 'http://dev-pi2-api.herokuapp.com/api-token-auth/',
+        url: '//dev-pi2-api.herokuapp.com/api-token-auth/',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
