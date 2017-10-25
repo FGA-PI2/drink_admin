@@ -128,9 +128,8 @@
                               <Option v-for="item in drinks" :value="item.nome" :key="item.nome">{{ item.nome }}</Option>
                             </Select>
                             </FormItem>
-                            {{novoDrink}}
                             <FormItem v-for="(item, index) in novoDrink.bebidas"  :key="item.nome" :label="item">
-                              <InputNumber :max="100" :min="0" :step="10" v-model="novoDrink.volumes[index]"></InputNumber>
+                              <InputNumber :max="100" :min="0" :step="10" v-model="novoDrink.volumes[index]">%</InputNumber>
                             </FormItem>
                             <FormItem label="Volume">
                                 <InputNumber :max="400" :min="400" v-model="novoDrink.volume"></InputNumber>
@@ -307,6 +306,81 @@ export default {
     }
   },
   methods: {
+    atualize () {
+      console.log('INICIOU O COMPUTED')
+      this.user = this.$store.getters.returnUser
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/users/`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        }
+      })
+      .done((res) => {
+        this.dataUsers = res
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/compra/`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        }
+      })
+      .done((res) => {
+        console.log('huhuhuhu', res)
+        this.dataOrders = res
+        for(let x in this.dataOrders){
+          this.dataOrders[x]['is_valid'] = this.dataOrders[x].qr_code.is_valid
+        }
+        console.log('ORDES', this.dataOrders)
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/bebida/`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        }
+      })
+      .done((res) => {
+        console.log('huhuhuhu', res)
+        this.drinks = res
+        this.data1 = res
+        this.setGraphics()
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+      oboe({
+        url: `http://dev-pi2-api.herokuapp.com/drink/`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.user.token
+        }
+      })
+      .done((res) => {
+        this.cardapio = res
+        this.data2 = res
+        console.log('AEHOOO', this.data2)
+        for(let x in this.data2){
+          for(let y in this.data2[x].proporcao){
+            this.data2[x].proporcao[y] = `${this.data2[x].proporcao[y].bebida} : ${this.data2[x].proporcao[y].volume} mL`
+          }
+        }
+      })
+      .fail((errorReport) => {
+        console.log(errorReport)
+      })
+    },
     asyncOK (type) {
       if(type == 'bebida') {
         oboe({
@@ -321,44 +395,58 @@ export default {
         .done((res) => {
           this.modalNewBebida = false
           this.$Message.success('Criado com Sucesso');
+          this.atualize()
         })
         .fail((errorReport) => {
           console.log(errorReport)
         })
       } else if(type == 'drink'){
-        console.log('CADASTRANDO DRINK')
-        let drink = this.novoDrink
-        drink['proporcao'] = []
-        for(let x in this.novoDrink.bebidas){
-          drink.proporcao.push({'bebida': this.novoDrink.bebidas[x], 'volume': this.novoDrink.volumes[x]})
+        let totalVolumeDrink = 0
+        for(let x in this.novoDrink.volumes){
+          totalVolumeDrink += this.novoDrink.volumes[x]
         }
-        delete drink['bebidas']
-        delete drink['volumes']
-        console.log(drink)
-        
-
-        oboe({
-          url: `http://dev-pi2-api.herokuapp.com/drink/`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': this.user.token
-          },
-          body: drink
-        })
-        .done((res, status) => {
-          this.modalNewDrink = false
-          if(res.nome == drink.nome){
-            this.$Message.success('Criado com Sucesso');
+        if( totalVolumeDrink == 100 ){
+          let drink = this.novoDrink
+          drink['proporcao'] = []
+          for(let x in this.novoDrink.bebidas){
+            let volumeInML = (this.novoDrink.volumes[x]*this.novoDrink.volume)/100
+            drink.proporcao.push({'bebida': this.novoDrink.bebidas[x], 'volume': volumeInML})
           }
-          this.novoDrink.bebidas = []
-          this.novoDrink.volumes = [0,0,0]
-        })
-        .fail((errorReport) => {
+          delete drink['bebidas']
+          delete drink['volumes']
+          console.log(drink)
+          oboe({
+            url: `http://dev-pi2-api.herokuapp.com/drink/`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.user.token
+            },
+            body: drink
+          })
+          .done((res, status) => {
+            this.modalNewDrink = false
+            if(res.nome == drink.nome){
+              this.$Message.success('Criado com Sucesso');
+            }
+            this.novoDrink = {
+              nome: null,
+              bebidas: [],
+              volumes: [0,0,0],
+              descricao: null,
+              volume: 400
+            }
+            this.atualize()
+          })
+          .fail((errorReport) => {
+            this.modalNewDrink = false
+            this.$Message.error('Ocorreu algum erro durante o processamento!');
+            console.log(errorReport)
+          })
+        } else {
           this.modalNewDrink = false
-          this.$Message.error('Ocorreu algum erro durante o processamento!');
-          console.log(errorReport)
-        })
+          this.$Message.error('O volume total precisa ser 100%!');
+        }
       }
     },
     del (type) {
@@ -385,7 +473,8 @@ export default {
         this.modal2.bool = false
         this.modal3.loading = false
         this.modal3.bool = false
-        this.$Message.success('删除成功');
+        this.$Message.success('Excluído com Sucesso!');
+        this.atualize()
       })
       .fail((errorReport) => {
         console.log(errorReport)
@@ -415,73 +504,7 @@ export default {
     }
   },
   mounted () {
-    console.log('INICIOU O COMPUTED')
-    this.user = this.$store.getters.returnUser
-    oboe({
-      url: `http://dev-pi2-api.herokuapp.com/users/`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.user.token
-      }
-    })
-    .done((res) => {
-      this.dataUsers = res
-    })
-    .fail((errorReport) => {
-      console.log(errorReport)
-    })
-    oboe({
-      url: `http://dev-pi2-api.herokuapp.com/compra/`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.user.token
-      }
-    })
-    .done((res) => {
-      console.log('huhuhuhu', res)
-      this.dataOrders = res
-      for(let x in this.dataOrders){
-        this.dataOrders[x]['is_valid'] = this.dataOrders[x].qr_code.is_valid
-      }
-      console.log('ORDES', this.dataOrders)
-    })
-    .fail((errorReport) => {
-      console.log(errorReport)
-    })
-    oboe({
-      url: `http://dev-pi2-api.herokuapp.com/bebida/`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.user.token
-      }
-    })
-    .done((res) => {
-      console.log('huhuhuhu', res)
-      this.drinks = res
-      this.data1 = res
-      this.setGraphics()
-    })
-    .fail((errorReport) => {
-      console.log(errorReport)
-    })
-    oboe({
-      url: `http://dev-pi2-api.herokuapp.com/drink/`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.user.token
-      }
-    })
-    .done((res) => {
-      this.cardapio = res
-      this.data2 = res
-    })
-    .fail((errorReport) => {
-      console.log(errorReport)
-    })
+    this.atualize()
   },
   computed: {
     iconSize () {
