@@ -68,7 +68,7 @@
                           v-model="modalNewBebida"
                           title="Cadastrar nova Bebida"
                           :loading="loading"
-                          @on-ok="asyncOK"
+                          @on-ok="asyncOK('bebida')"
                           cancel-text="Cancelar">
                           <Form label-position="left" :label-width="100">
                             <FormItem label="Nome">
@@ -96,7 +96,7 @@
                   <Card dis-hover>
                       <p slot="title">Drinks do Cardápio</p>
                       <Table :columns="columns2" :data="data2"></Table>
-                      <Button type="success" @click="modalNewBebida = true" long>Cadastrar Novo Drinks</Button>
+                      <Button type="success" @click="modalNewDrink = true" long>Cadastrar Novo Drink</Button>
                       <Modal v-model="modal3.bool" width="360">
                         <p slot="header" style="color:#f60;text-align:center">
                             <Icon type="information-circled"></Icon>
@@ -110,6 +110,33 @@
                             <Button type="error" size="large" long :loading="modal3.loading" @click="del('drink')">Excluir</Button>
                         </div>
                         </Modal>
+                        <Modal
+                          v-model="modalNewDrink"
+                          title="Cadastrar novo Drink"
+                          :loading="loading"
+                          @on-ok="asyncOK('drink')"
+                          cancel-text="Cancelar">
+                          <Form label-position="left" :label-width="100">
+                            <FormItem label="Nome">
+                                <Input v-model="novoDrink.nome"></Input>
+                            </FormItem>
+                            <FormItem label="Descrição">
+                                <Input v-model="novoDrink.descricao"></Input>
+                            </FormItem>
+                            <FormItem label="Selecione as bebidas">
+                            <Select v-model="novoDrink.bebidas" multiple style="width:260px">
+                              <Option v-for="item in drinks" :value="item.nome" :key="item.nome">{{ item.nome }}</Option>
+                            </Select>
+                            </FormItem>
+                            {{novoDrink}}
+                            <FormItem v-for="(item, index) in novoDrink.bebidas"  :key="item.nome" :label="item">
+                              <InputNumber :max="100" :min="0" :step="10" v-model="novoDrink.volumes[index]"></InputNumber>
+                            </FormItem>
+                            <FormItem label="Volume">
+                                <InputNumber :max="400" :min="400" v-model="novoDrink.volume"></InputNumber>
+                            </FormItem>
+                        </Form>
+                      </Modal>
                   </Card>
 
 
@@ -130,10 +157,18 @@
 <script>
 /* eslint-disable */
 import oboe from 'oboe'
+import Vue from 'vue'
 export default {
   data () {
     return {
       loading: true,
+      novoDrink: {
+        nome: null,
+        bebidas: [],
+        volumes: [0,0,0],
+        descricao: null,
+        volume: 400
+      },
       novaBebida: {
         nome: null,
         posicao: null,
@@ -143,6 +178,7 @@ export default {
       },
       orders: null,
       modalNewBebida: false,
+      modalNewDrink: false,
       modal2: {
         bool: false,
         index: null,
@@ -271,23 +307,59 @@ export default {
     }
   },
   methods: {
-    asyncOK () {
-      oboe({
-        url: `http://dev-pi2-api.herokuapp.com/bebida/`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': this.user.token
-        },
-        body: this.novaBebida
-      })
-      .done((res) => {
-        this.modalNewBebida = false
-        this.$Message.success('Criado com Sucesso');
-      })
-      .fail((errorReport) => {
-        console.log(errorReport)
-      })
+    asyncOK (type) {
+      if(type == 'bebida') {
+        oboe({
+          url: `http://dev-pi2-api.herokuapp.com/bebida/`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.user.token
+          },
+          body: this.novaBebida
+        })
+        .done((res) => {
+          this.modalNewBebida = false
+          this.$Message.success('Criado com Sucesso');
+        })
+        .fail((errorReport) => {
+          console.log(errorReport)
+        })
+      } else if(type == 'drink'){
+        console.log('CADASTRANDO DRINK')
+        let drink = this.novoDrink
+        drink['proporcao'] = []
+        for(let x in this.novoDrink.bebidas){
+          drink.proporcao.push({'bebida': this.novoDrink.bebidas[x], 'volume': this.novoDrink.volumes[x]})
+        }
+        delete drink['bebidas']
+        delete drink['volumes']
+        console.log(drink)
+        
+
+        oboe({
+          url: `http://dev-pi2-api.herokuapp.com/drink/`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.user.token
+          },
+          body: drink
+        })
+        .done((res, status) => {
+          this.modalNewDrink = false
+          if(res.nome == drink.nome){
+            this.$Message.success('Criado com Sucesso');
+          }
+          this.novoDrink.bebidas = []
+          this.novoDrink.volumes = [0,0,0]
+        })
+        .fail((errorReport) => {
+          this.modalNewDrink = false
+          this.$Message.error('Ocorreu algum erro durante o processamento!');
+          console.log(errorReport)
+        })
+      }
     },
     del (type) {
       console.log('lalaa', type, this.modal3)
