@@ -5,7 +5,7 @@
       <Menu active-name="1" theme="dark" width="auto">
         <div class="layout-logo-left"></div>
         <MenuItem name="1" @click="option = '1'">
-            <Icon type="ios-navigate" :size="iconSize"></Icon>
+            <Icon type="ios-navigate" :size="iconSize" @click="option = '1'"></Icon>
             <span class="layout-text" @click="option = '1'">Início</span>
         </MenuItem>
         <MenuItem name="2">

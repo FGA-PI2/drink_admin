@@ -51,6 +51,15 @@ export default {
     }
   },
   methods: {
+    confirm2 () {
+      this.$Modal.warning({
+        title: '<center>Atenção!</center>',
+        content: '<center>Email ou senha Incorretas!</center>'
+      })
+      this.spinShow = false
+      this.formInline.user = ''
+      this.formInline.password = ''
+    },
     confirm () {
       this.$Modal.warning({
         title: '<center>Atenção!</center>',
@@ -70,9 +79,11 @@ export default {
         }
       })
       .done((res) => {
-        console.log(res)
+        console.log('AAAAA: ', res)
         if (res[0].is_superuser === false) {
           this.confirm()
+        } else if (res.statusCode === 400) {
+          this.confirm2()
         } else {
           console.log(this.$store.state.user)
           let user = {
@@ -88,6 +99,7 @@ export default {
         }
       })
       .fail((errorReport) => {
+        this.confirm2()
         console.log(errorReport)
       })
     },
@@ -110,6 +122,7 @@ export default {
         }
       })
       .fail((errorReport) => {
+        this.confirm2()
         console.log(errorReport)
       })
       console.log(this.formInline.user)
